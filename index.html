@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#10181a">
+    <title>사격 타이밍 연습</title>
+      <meta name="description" content="화면을 길게 누르고 움직여 조준한 뒤 손을 떼면 격발하는 공기소총 타이밍 연습 게임입니다.">
+      <link rel="stylesheet" href="./style.css?v=8">
+    </head>
+    <body>
+      <main class="app">
+        <div class="photo-wrap">
+          <canvas id="sight" tabindex="0" role="button" aria-keyshortcuts="Space ArrowUp ArrowDown ArrowLeft ArrowRight" aria-label="조준 화면: 누른 채 드래그로 조준하고 손을 떼면 격발">
+          </canvas>
+          <section class="trace-panel" aria-label="화면 좌측 전자 조준 궤적">
+            <div class="trace-title">
+              <span>
+                <i>
+                </i>조준 궤적</span>
+                <small>3초</small>
+                </div>
+                <div class="trace-body">
+                  <canvas id="trace" aria-label="조준 위치와 이동 경로">
+                  </canvas>
+                  <span id="trace-coordinates">X — Y —</span>
+                  </div>
+                  <button class="trace-hit" id="trace-open" aria-label="조준 궤적 확대" aria-haspopup="dialog">
+                    <span id="trace-hint">터치하여 확대 ↗</span>
+                    </button>
+                  </section>
+                  <span class="shot-flash" id="shot-flash">
+                  </span>
+                </div>
+                <header class="game-hud">
+                  <div class="hud-score">
+                    <small>합계</small>
+                      <strong id="total">0.0</strong>
+                        <span>/ 109.0</span>
+                          <ol class="hud-shot-list" id="hud-shot-list" aria-label="1발부터 10발까지 점수">
+                          </ol>
+                        </div>
+                        <div class="hud-count">
+                          <small>조준 시간</small>
+                            <strong id="elapsed">00:00.0</strong>
+                              <span id="shot-number" hidden>0</span>
+                              </div>
+                              <div class="hud-actions">
+                                <button id="results-open" aria-label="격발 기록 열기">기록</button>
+                                  <button id="reset" aria-label="다시 시작">다시시작</button>
+                                    <button id="settings-open" aria-label="설정 열기">⚙</button>
+                                    </div>
+                                  </header>
+                                  <div class="status-row">
+                                    <button id="cancel" aria-label="조준 취소: 여기로 끌어다 놓거나 Esc" hidden>끌어서 취소</button>
+                                    </div>
+                                    <div class="sight-caption" id="sight-caption">0.7초 이상 누르고 조준 · 떼면 격발</div>
+                                      <p class="sr-only" id="announcement" role="status" aria-live="polite">
+                                      </p>
+                                    </main>
+                                    <dialog id="results">
+                                      <form method="dialog" class="dialog-title">
+                                        <h2>격발 기록</h2>
+                                          <button class="icon-button" aria-label="기록 닫기">×</button>
+                                          </form>
+                                          <section class="session-panel">
+                                            <div id="shot-strip" class="shot-strip" aria-label="발별 점수">
+                                            </div>
+                                            <div class="session-footer">
+                                              <span>평균 <b id="average">—</b>
+                                              </span>
+                                              <span>최고 <b id="best">—</b>
+                                              </span>
+                                              <span id="difficulty-label">기본</span>
+                                              </div>
+                                            </section>
+                                            <section class="result-panel" aria-label="격발 결과">
+                                              <div class="section-title">
+                                                <h2 id="result-title">이번 격발</h2>
+                                                  <span id="result-shot">준비</span>
+                                                  </div>
+                                                  <div class="result-score">
+                                                    <strong id="score">—</strong>
+                                                      <span>점</span>
+                                                      </div>
+                                                      <p id="feedback">0.7초 이상 누른 뒤 손을 떼면 격발합니다.</p>
+                                                        <div class="metrics">
+                                                          <div>
+                                                            <span>마지막 1초 흔들림</span>
+                                                              <strong id="stability">—<small> mm</small>
+                                                              </strong>
+                                                            </div>
+                                                            <div>
+                                                              <span>마지막 0.2초 이동</span>
+                                                                <strong id="travel">—<small> mm</small>
+                                                                </strong>
+                                                              </div>
+                                                              <div>
+                                                                <span>조준 시간</span>
+                                                                  <strong id="duration">—<small> s</small>
+                                                                  </strong>
+                                                                </div>
+                                                              </div>
+                                                              <button class="wide-button" id="replay" disabled>격발 직전 다시 보기 · ½ 속도</button>
+                                                              </section>
+                                                            </dialog>
+                                                            <dialog id="trace-expanded" aria-labelledby="trace-large-title">
+                                                              <form method="dialog" class="dialog-title">
+                                                                <h2 id="trace-large-title">조준 궤적</h2>
+                                                                  <button class="icon-button" aria-label="확대 궤적 닫기">×</button>
+                                                                  </form>
+                                                                  <div class="trace-large-box">
+                                                                    <canvas id="trace-large" aria-label="확대된 조준 위치와 이동 경로">
+                                                                    </canvas>
+                                                                  </div>
+                                                                  <div class="trace-large-legend">
+                                                                    <span>
+                                                                      <i>
+                                                                      </i>조준 경로 · 최근 3초</span>
+                                                                      <span>
+                                                                        <i class="shot">
+                                                                        </i>격발 위치</span>
+                                                                      </div>
+                                                                      <p class="trace-large-info" id="trace-large-info">아직 격발 기록이 없어요</p>
+                                                                      </dialog>
+                                                                      <dialog id="settings">
+                                                                        <form method="dialog">
+                                                                          <div class="dialog-title">
+                                                                            <h2>연습 설정</h2>
+                                                                              <button class="icon-button" aria-label="설정 닫기">×</button>
+                                                                              </div>
+                                                                              <label class="setting-row">흔들림 배율<select id="difficulty">
+                                                                                <option value="easy">입문 · 0.65배</option>
+                                                                                  <option value="normal" selected>기본 · 1배</option>
+                                                                                    <option value="hard">도전 · 1.5배</option>
+                                                                                    </select>
+                                                                                  </label>
+                                                                                  <label class="setting-row">
+                                                                                    <span>격발 소리</span>
+                                                                                      <input id="sound" type="checkbox" checked />
+                                                                                    </label>
+                                                                                    <label class="setting-row">
+                                                                                      <span>격발 진동<small id="haptic-status">지원 기기에서 선택한 패턴</small>
+                                                                                      </span>
+                                                                                      <input id="haptics" type="checkbox" />
+                                                                                    </label>
+                                                                                    <label class="setting-row">
+                                                                                      <span>진동 느낌<small>길이·패턴으로 조절</small>
+                                                                                      </span>
+                                                                                      <select id="haptic-level">
+                                                                                        <option value="short">짧게</option>
+                                                                                          <option value="normal">보통</option>
+                                                                                            <option value="strong">강하게 · 두 번</option>
+                                                                                            </select>
+                                                                                          </label>
+                                                                                          <button class="wide-button secondary" id="haptic-test" type="button">진동 테스트</button>
+                                                                                            <p class="dialog-note" id="haptic-test-note">웹에서는 진동 길이와 패턴을 조절합니다</p>
+                                                                                              <button class="wide-button secondary" id="fullscreen" type="button" hidden>브라우저 전체화면</button>
+                                                                                                <p class="dialog-note" id="fullscreen-note">
+                                                                                                </p>
+                                                                                                <p class="dialog-note">손가락 이동으로 조준을 보정할 수 있어요. 흔들림과 합성 호흡은 계속됩니다.<br>진동은 탄착을 확정한 뒤 재생합니다.</p>
+                                                                                                </form>
+                                                                                              </dialog>
+                                                                                              <script type="module" src="./app.js?v=8">
+                                                                                              </script>
+                                                                                              <script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a58ce3b5aa710578',t:'MTc5NDM5NTgzNQ=='};var l=window.parent.location,o;try{o=new URL(l.origin).origin}catch(e){try{o=new URL(new URL(l.href).origin).origin}catch(e){o=''}}var u='/cdn-cgi/challenge-platform/scripts/jsd/main.js?ray=a58ce3b5aa710578',a=document.createElement('script');a.src=o?new URL(u,o).href:u;document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
+                                                                                              </body>
+                                                                                            </html>
